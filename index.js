@@ -40,9 +40,6 @@ const tempProduct = fs.readFileSync(`${__dirname}/starter/templates/template-pro
 const data = fs.readFileSync(`${__dirname}/starter/dev-data/data.json` , 'utf-8');
 const dataObj = JSON.parse(data);
 
-const slugs = dataObj.map(el => slugify(el.productName, {lower : true}))
-console.log(slugs);
-
 function slugToProductName(slug) {
     return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -59,26 +56,19 @@ const server = http.createServer((req, res) => {  // 'res' et 'req' sont des obj
         });
         const cardsHtml = dataObj.map(el=> replaceTemplate(tempCard, el)).join('');
         const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);  
-        console.log('output======================================================>',output)
         res.end(output);
     }
     //Product page
     else if(pathname === '/product') {
-        console.log('req.url -------------->', req.url);
-        console.log('url.parse(req.url, true); -------------->', url.parse(req.url, true));
-        console.log('url -------------->', url);
         res.writeHead(200, {
             'Content-type':'text/html'
         });
-        console.log('query -----$%%%%%%%%%%%%%%%%%%%%%%%%%%%%%--------->', query);
         // const product = dataObj[query.prodname];
         const productName = slugToProductName(query.prodname);
 
         const product = dataObj.find(el => el.productName === productName); // Trouve le produit correspondant par nom
 
         const output = replaceTemplate(tempProduct, product);  
-        console.log('product====>',product)
-        console.log('output====>',output)
 
         res.end(output);
     }
